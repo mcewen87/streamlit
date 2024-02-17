@@ -4,14 +4,15 @@ from sklearn.preprocessing import MinMaxScaler
 import altair as alt
 import numpy as np
 # Data
-songs = pd.read_csv(
-    '/Users/jonmcewen/Desktop/Content/Python Demos/country_music_by_decades/country_songs_by_decade.csv', index_col=[0])
+songs = pd.read_csv('country_songs_by_decade.csv', index_col=[0])
 
 # SELECT MEANINGFUL FEATURES
-# - these features are auidble 
+# - these features are auidble
 
-features = songs[['artist', 'name', 'decade', 'danceability', 'loudness', 'valence', 'energy', 'tempo']].copy()
-feature_values = songs[['danceability', 'loudness', 'valence', 'energy', 'tempo']].copy()
+features = songs[['artist', 'name', 'decade', 'danceability',
+                  'loudness', 'valence', 'energy', 'tempo']].copy()
+feature_values = songs[['danceability', 'loudness',
+                        'valence', 'energy', 'tempo']].copy()
 
 # NORMALIZE VALUES
 # - loudness and tempo are not on a [0,1] scale
@@ -20,7 +21,7 @@ x = features[['loudness', 'tempo']]
 x_scaled = min_max_scaler.fit_transform(x)
 features[['loudness', 'tempo']] = x_scaled
 
-# ADD DECADE FIELD 
+# ADD DECADE FIELD
 # - use .map to map decade values
 decade_mapping = {
     '70s': 1970,
@@ -33,6 +34,7 @@ decade_mapping = {
 features['decade_year'] = songs['decade'].map(decade_mapping)
 
 correlation = feature_values.corr()
+
 
 def summary_logic(df):
     data = {}
@@ -54,11 +56,12 @@ def summary_logic(df):
 
     return pd.Series(data)
 
-summary = features.groupby(by=['decade_year']).apply(summary_logic).reset_index()
+
+summary = features.groupby(by=['decade_year']).apply(
+    summary_logic).reset_index()
 
 
-
-# Custom CSS 
+# Custom CSS
 custom_css = """
 <style>
 .big-font {
@@ -97,7 +100,8 @@ st.header("Intro")
 st.markdown(f'<p class="big-font">{intro}</p>', unsafe_allow_html=True)
 
 st.header("Audio elements:")
-st.markdown(f'<p class="green-font"> Descriptions from Spotify website. </p>', unsafe_allow_html=True)
+st.markdown(f'<p class="green-font"> Descriptions from Spotify website. </p>',
+            unsafe_allow_html=True)
 st.markdown("""
             Loudness - The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typically range between -60 and 0 db.
          
@@ -110,22 +114,24 @@ st.markdown("""
             Danceability - Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
             """)
 st.header("Summary table:")
-st.markdown(f'<p class="big-font"> Before looking at visuals, here’s a summary table for our analysis. </p>', unsafe_allow_html=True)
-st.dataframe(summary)  
+st.markdown(f'<p class="big-font"> Before looking at visuals, here’s a summary table for our analysis. </p>',
+            unsafe_allow_html=True)
+st.dataframe(summary)
 st.markdown(f'<p class="big-font">We can already see some easy takeaways. The 90s were the happiest decade, and country music has gotten progressively louder. </p>', unsafe_allow_html=True)
 st.header("Line Graphs:")
 st.divider()
-st.markdown(f'<p class="big-font">These line charts track the average value of each feature across the decades. Averages are on a [0,1] scale.</p>', unsafe_allow_html=True)
+st.markdown(
+    f'<p class="big-font">These line charts track the average value of each feature across the decades. Averages are on a [0,1] scale.</p>', unsafe_allow_html=True)
 
 # Dance
 st.subheader("Danceability")
 
 
 c_danceability = (
-   alt.Chart(summary)
-   .mark_line()
-   .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_danceability:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Danceability"))
-   .configure_axis(
+    alt.Chart(summary)
+    .mark_line()
+    .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_danceability:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Danceability"))
+    .configure_axis(
         labelFontSize=16,  # Adjust font size for axis labels
         titleFontSize=18   # Adjust font size for axis titles
     )
@@ -139,15 +145,16 @@ c_danceability = (
 )
 
 st.altair_chart(c_danceability, use_container_width=True)
-st.markdown(f'<p class="green"> Not much change here! </p>', unsafe_allow_html=True)
+st.markdown(f'<p class="green"> Not much change here! </p>',
+            unsafe_allow_html=True)
 
 # Loudness
 st.subheader("Loudness")
 c_loudness = (
-   alt.Chart(summary)
-   .mark_line()
-   .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_loudness:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Loudness"))
-   .configure_axis(
+    alt.Chart(summary)
+    .mark_line()
+    .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_loudness:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Loudness"))
+    .configure_axis(
         labelFontSize=16,  # Adjust font size for axis labels
         titleFontSize=18   # Adjust font size for axis titles
     )
@@ -163,16 +170,17 @@ c_loudness = (
 st.altair_chart(c_loudness, use_container_width=True)
 
 
-st.markdown(f'<p class="green"> Things got louder, as you can see. </p>', unsafe_allow_html=True)
+st.markdown(f'<p class="green"> Things got louder, as you can see. </p>',
+            unsafe_allow_html=True)
 
 # Valence
 st.subheader("Valence")
 
 c_valence = (
-   alt.Chart(summary)
-   .mark_line()
-   .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_valence:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Valence"))
-   .configure_axis(
+    alt.Chart(summary)
+    .mark_line()
+    .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_valence:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Valence"))
+    .configure_axis(
         labelFontSize=16,  # Adjust font size for axis labels
         titleFontSize=18   # Adjust font size for axis titles
     )
@@ -188,15 +196,16 @@ c_valence = (
 st.altair_chart(c_valence, use_container_width=True)
 
 
-st.markdown(f'<p class="green"> Contemporary country is slightly sadder than classic country.</p>', unsafe_allow_html=True)
+st.markdown(f'<p class="green"> Contemporary country is slightly sadder than classic country.</p>',
+            unsafe_allow_html=True)
 # Tempo
 st.subheader("Tempo")
 
 c_tempo = (
-   alt.Chart(summary)
-   .mark_line()
-   .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_tempo:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Tempo"))
-   .configure_axis(
+    alt.Chart(summary)
+    .mark_line()
+    .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_tempo:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Tempo"))
+    .configure_axis(
         labelFontSize=16,  # Adjust font size for axis labels
         titleFontSize=18   # Adjust font size for axis titles
     )
@@ -212,15 +221,16 @@ c_tempo = (
 st.altair_chart(c_tempo, use_container_width=True)
 
 
-st.markdown(f'<p class="green"> A slight uptick in tempo over the years...</p>', unsafe_allow_html=True)
+st.markdown(f'<p class="green"> A slight uptick in tempo over the years...</p>',
+            unsafe_allow_html=True)
 # Energy
 st.subheader("Energy")
 
 c_energy = (
-   alt.Chart(summary)
-   .mark_line()
-   .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_energy:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Energy"))
-   .configure_axis(
+    alt.Chart(summary)
+    .mark_line()
+    .encode(x=alt.X("decade_year:O", axis=alt.Axis(labelAngle=-45), title="Decade"), y=alt.Y('avg_energy:Q', scale=alt.Scale(domain=[.3, 1]), title="Average Energy"))
+    .configure_axis(
         labelFontSize=16,  # Adjust font size for axis labels
         titleFontSize=18   # Adjust font size for axis titles
     )
@@ -236,18 +246,19 @@ c_energy = (
 st.altair_chart(c_energy, use_container_width=True)
 
 
-st.markdown(f'<p class="green"> More energy over the years! </p>', unsafe_allow_html=True)
+st.markdown(f'<p class="green"> More energy over the years! </p>',
+            unsafe_allow_html=True)
 
 st.header("Correlation:")
 st.markdown(f'<p class="big-font">From the line charts, what features do you think are the most tightly correlated? Here is what the data shows. </p>', unsafe_allow_html=True)
-st.dataframe(correlation)  
+st.dataframe(correlation)
 st.markdown(f'<p class="green"> No surprises here, loudness and energy have a strong correlation. Here is a scatter plot of the two features. </p>', unsafe_allow_html=True)
 st.write("--")
 c_cor = (
-   alt.Chart(features)
-   .mark_point()
-   .encode(x=alt.X('loudness', title='Loudness'),  y=alt.Y('energy', title="Energy"))
-   .configure_axis(
+    alt.Chart(features)
+    .mark_point()
+    .encode(x=alt.X('loudness', title='Loudness'),  y=alt.Y('energy', title="Energy"))
+    .configure_axis(
         labelFontSize=16,  # Adjust font size for axis labels
         titleFontSize=18   # Adjust font size for axis titles
     )
@@ -297,7 +308,8 @@ print("Best cross-validation score:", grid_search.best_score_)'''
 st.code(code, language='python')
 st.markdown(f"<p>Best parameters: 'svc__C': 1, 'svc__degree': 2, 'svc__gamma': 'scale', 'svc__kernel': 'linear'</p>", unsafe_allow_html=True)
 
-st.markdown(f'<p>Best cross-validation score: 0.4819418676561534</p>', unsafe_allow_html=True)
+st.markdown(f'<p>Best cross-validation score: 0.4819418676561534</p>',
+            unsafe_allow_html=True)
 
 
 st.markdown(f'<p class="big-font">As you might expect, the SVM had trouble predicting the decade. It was only accurate about 50% of the time.</p>', unsafe_allow_html=True)
